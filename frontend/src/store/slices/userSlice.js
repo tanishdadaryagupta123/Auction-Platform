@@ -6,7 +6,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../../api/baseApi";
-import api from '../api/axios';
 
 // Define API_BASE_URL at the top
 // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
@@ -123,11 +122,16 @@ export const register = (data) => async (dispatch) => {
       }
     });
 
-    const response = await api.post('/api/v1/user/register', formData, {
-      headers: { 
-        'Content-Type': 'multipart/form-data'
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/user/register`,
+      formData,
+      {
+        withCredentials: true,
+        headers: { 
+          'Content-Type': 'multipart/form-data'
+        }
       }
-    });
+    );
 
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
@@ -187,7 +191,13 @@ export const logout = () => async (dispatch) => {
 export const fetchUser = () => async (dispatch) => {
   dispatch(userSlice.actions.fetchUserRequest());
   try {
-    const response = await api.get('/api/v1/user/me');
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${BASE_URL}/api/v1/user/me`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
   } catch (error) {
     console.error('Fetch User Error:', error);
