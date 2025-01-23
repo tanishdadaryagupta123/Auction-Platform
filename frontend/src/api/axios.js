@@ -16,11 +16,9 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      // Ensure token is properly formatted
-      if (!config.headers.Authorization.startsWith('Bearer ')) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
     }
+    // Add CORS headers to every request
+    config.headers['Access-Control-Allow-Credentials'] = true
     return config
   },
   (error) => Promise.reject(error)

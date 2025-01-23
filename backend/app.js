@@ -26,7 +26,11 @@ config({
 // cors is used to connect frontend and backend
 app.use(
   cors({
-    origin: ["https://auction-platform-ruddy.vercel.app"],
+    origin: [
+      "https://auction-platform-ruddy.vercel.app",
+      "https://auction-platform-neon.vercel.app",
+      "http://localhost:3000"
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
@@ -37,9 +41,24 @@ app.use(
       "Origin",
       "Accept"
     ],
-    exposedHeaders: ["set-cookie"]
+    exposedHeaders: ["set-cookie"],
+    optionsSuccessStatus: 200
   })
 );
+
+// Add preflight handler
+app.options('*', cors());
+
+// Add security headers middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  next();
+});
 
 app.use(cookieParser()); // this is used to access the cookies. because we dont use cookieparser so cookie is only generate but we dont access.
 app.use(express.json());// it help to return the data in json formate. we dont use this so we dont access the data

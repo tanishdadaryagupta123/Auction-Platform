@@ -16,11 +16,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: undefined,
-        entryFileNames: 'assets/[name].[hash].mjs',
-        chunkFileNames: 'assets/[name].[hash].mjs',
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: ({name}) => {
           if (/\.(css)$/.test(name ?? '')) {
-            return 'assets/css/[name].[hash][extname]';
+            return 'assets/[name].[hash][extname]';
           }
           if (/\.(png|jpe?g|gif|svg|ico|webp)$/.test(name ?? '')) {
             return 'assets/images/[name].[hash][extname]';
