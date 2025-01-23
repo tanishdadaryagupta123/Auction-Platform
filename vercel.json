@@ -1,35 +1,45 @@
 {
   "version": 2,
-  "routes": [
-    {
-      "src": "^/assets/.*\\.js$",
-      "headers": {
-        "Content-Type": "application/javascript",
-        "Cache-Control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "src": "^/assets/.*\\.css$",
-      "headers": {
-        "Content-Type": "text/css",
-        "Cache-Control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "src": "^/assets/.*\\.(jpg|jpeg|png|gif|ico|svg)$",
-      "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/.*",
-      "dest": "/index.html"
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)\\.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)\\.mjs",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)\\.css",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
@@ -52,6 +62,8 @@
       ]
     }
   ],
+  "cleanUrls": true,
+  "trailingSlash": false,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite"
