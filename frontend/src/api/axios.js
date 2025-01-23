@@ -4,8 +4,7 @@ import { API_URL } from '../config/config'
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': 'https://auction-platform-ruddy.vercel.app'
+    'Content-Type': 'application/json'
   },
   withCredentials: true
 })
@@ -13,11 +12,6 @@ const api = axios.create({
 // Add request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Remove any localhost URLs
-    if (config.url?.startsWith('http://localhost')) {
-      config.url = config.url.replace('http://localhost:5001', API_URL)
-    }
-    
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
