@@ -15,7 +15,7 @@
         },
         {
           "key": "Access-Control-Allow-Origin",
-          "value": "*"
+          "value": "https://your-render-backend-url.onrender.com"
         },
         {
           "key": "Access-Control-Allow-Methods",

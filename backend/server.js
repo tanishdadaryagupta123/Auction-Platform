@@ -1,5 +1,6 @@
 import app from "./app.js";
 import cloudinary from "cloudinary";
+import cors from "cors";
 
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -7,6 +8,13 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server listening on port ${process.env.PORT}`);
+const port = process.env.PORT || 5001;
+
+app.use(cors({
+  origin: "https://auction-platform-ruddy.vercel.app",
+  credentials: true
+}));
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });
