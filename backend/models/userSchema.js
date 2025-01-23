@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
-  name: {
+  userName: {
     type: String,
     required: [true, "Please enter your name"],
   },
@@ -12,6 +12,14 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please enter your email"],
     unique: true,
   },
+  phone: {
+    type: String,
+    required: [true, "Please enter your phone number"],
+  },
+  address: {
+    type: String,
+    required: [true, "Please enter your address"],
+  },
   password: {
     type: String,
     required: [true, "Please enter your password"],
@@ -19,12 +27,25 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["auctioneer", "bidder"],
-    default: "bidder",
+    enum: ["Auctioneer", "Bidder"],
+    default: "Bidder",
   },
-  avatar: {
+  profileImage: {
     public_id: String,
     url: String
+  },
+  paymentMethods: {
+    bankTransfer: {
+      bankAccountNumber: String,
+      bankAccountName: String,
+      bankName: String,
+    },
+    reservepay: {
+      reservepayAccountNumber: String,
+    },
+    paypal: {
+      paypalEmail: String,
+    },
   },
   moneySpent: {
     type: Number,

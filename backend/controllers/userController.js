@@ -6,24 +6,34 @@ import { generateToken } from "../utils/jwtToken.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
   try {
-    console.log('Registration request body:', req.body);
-    console.log('Registration files:', req.files);
+    const { 
+      userName, 
+      email, 
+      phone, 
+      password, 
+      address, 
+      role,
+      bankAccountName,
+      bankAccountNumber,
+      bankName,
+      reservepayAccountNumber,
+      paypalEmail
+    } = req.body;
 
-    const { name, email, password, role } = req.body;
-    
-    if (!name || !email || !password) {
+    // Validate required fields
+    if (!userName || !email || !password || !phone || !address || !role) {
       return res.status(400).json({
         success: false,
         message: "Please provide all required fields"
       });
     }
 
-    let avatar = undefined;
+    let profileImage = undefined;
 
-    if (req.files && req.files.avatar) {
+    if (req.files && req.files.profileImage) {
       try {
         const result = await cloudinary.v2.uploader.upload(
-          req.files.avatar.tempFilePath,
+          req.files.profileImage.tempFilePath,
           {
             folder: "avatars",
             width: 150,
@@ -31,7 +41,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
           }
         );
         
-        avatar = {
+        profileImage = {
           public_id: result.public_id,
           url: result.secure_url,
         };
@@ -45,29 +55,35 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       }
     }
 
-    // Check if user exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "User already exists with this email"
-      });
-    }
-
-    // Create user
+    // Create user data object
     const userData = {
-      name,
+      userName,
       email,
+      phone,
       password,
-      role: role || 'bidder'
+      address,
+      role,
+      profileImage
     };
 
-    if (avatar) {
-      userData.avatar = avatar;
+    // Add payment methods if role is Auctioneer
+    if (role === "Auctioneer") {
+      userData.paymentMethods = {
+        bankTransfer: {
+          bankAccountNumber,
+          bankAccountName,
+          bankName,
+        },
+        reservepay: {
+          reservepayAccountNumber,
+        },
+        paypal: {
+          paypalEmail,
+        },
+      };
     }
 
     const user = await User.create(userData);
-
     const token = user.getJWTToken();
 
     res.status(201).json({
@@ -76,10 +92,10 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       token,
       user: {
         _id: user._id,
-        name: user.name,
+        userName: user.userName,
         email: user.email,
         role: user.role,
-        avatar: user.avatar
+        profileImage: user.profileImage
       }
     });
   } catch (error) {

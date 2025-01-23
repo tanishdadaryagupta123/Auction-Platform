@@ -120,13 +120,28 @@ export const register = (data) => async (dispatch) => {
   dispatch(userSlice.actions.registerRequest());
   try {
     const formData = new FormData();
-    Object.keys(data).forEach(key => {
-      if (key === 'avatar' && data[key]) {
-        formData.append(key, data[key]);
-      } else {
-        formData.append(key, data[key]);
-      }
-    });
+    
+    // Add all form fields
+    formData.append("userName", data.userName);
+    formData.append("email", data.email);
+    formData.append("phone", data.phone);
+    formData.append("password", data.password);
+    formData.append("address", data.address);
+    formData.append("role", data.role);
+    
+    // Add profile image if exists
+    if (data.profileImage) {
+      formData.append("profileImage", data.profileImage);
+    }
+
+    // Add payment details if role is Auctioneer
+    if (data.role === "Auctioneer") {
+      formData.append("bankAccountName", data.bankAccountName);
+      formData.append("bankAccountNumber", data.bankAccountNumber);
+      formData.append("bankName", data.bankName);
+      formData.append("reservepayAccountNumber", data.reservepayAccountNumber);
+      formData.append("paypalEmail", data.paypalEmail);
+    }
 
     const response = await axios.post(
       `${BASE_URL}/api/v1/user/register`,
