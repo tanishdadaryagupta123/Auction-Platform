@@ -14,24 +14,27 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     rollupOptions: {
-      input: {
-        main: './index.html'
-      },
       output: {
-        assetFileNames: (assetInfo) => {
-          let extType = assetInfo.name.split('.')[1];
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            extType = 'img';
+        manualChunks: undefined,
+        entryFileNames: 'assets/[name].[hash].mjs',
+        chunkFileNames: 'assets/[name].[hash].mjs',
+        assetFileNames: ({name}) => {
+          if (/\.(css)$/.test(name ?? '')) {
+            return 'assets/css/[name].[hash][extname]';
           }
-          return `assets/${extType}/[name]-[hash][extname]`;
-        },
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js',
+          if (/\.(png|jpe?g|gif|svg|ico|webp)$/.test(name ?? '')) {
+            return 'assets/images/[name].[hash][extname]';
+          }
+          return 'assets/[name].[hash][extname]';
+        }
       }
     },
     sourcemap: true,
     minify: 'esbuild',
-    manifest: true
+    manifest: true,
+    modulePreload: {
+      polyfill: true
+    }
   },
   define: {
     'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_BASE_URL)
