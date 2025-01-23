@@ -47,7 +47,7 @@ export default defineConfig(({ mode }) => {
       }
     },
     define: {
-      __API_URL__: JSON.stringify(isProduction ? env.VITE_API_URL : 'http://localhost:5001')
+      'process.env.VITE_API_URL': JSON.stringify('https://auction-platform-icse.onrender.com')
     },
     esbuild: {
       loader: 'jsx',

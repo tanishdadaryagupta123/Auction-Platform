@@ -12,6 +12,9 @@ const api = axios.create({
 // Add request interceptor
 api.interceptors.request.use(
   (config) => {
+    // Force the base URL to always be the production URL
+    config.baseURL = 'https://auction-platform-icse.onrender.com'
+    
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
