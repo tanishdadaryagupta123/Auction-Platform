@@ -3,12 +3,20 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
  
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      jsxRuntime: 'automatic',
+      jsxImportSource: 'react',
+      babel: {
+        plugins: ['@babel/plugin-transform-react-jsx']
+      }
+    })
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    extensions: ['.js', '.jsx', '.json']
+    extensions: ['.mjs', '.js', '.jsx', '.json']
   },
   build: {
     outDir: 'dist',
