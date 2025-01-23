@@ -1,1 +1,1 @@
-export const API_URL = 'https://auction-platform-icse.onrender.com' 
+export const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'; 
