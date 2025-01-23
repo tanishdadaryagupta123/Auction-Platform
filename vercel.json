@@ -15,7 +15,7 @@
         },
         {
           "key": "Access-Control-Allow-Origin",
-          "value": "https://your-render-backend-url.onrender.com"
+          "value": "https://auction-platform-icse.onrender.com"
         },
         {
           "key": "Access-Control-Allow-Methods",

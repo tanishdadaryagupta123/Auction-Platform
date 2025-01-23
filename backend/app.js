@@ -12,6 +12,12 @@ import commissionRouter from "./router/commissionRouter.js";
 import superAdminRouter from "./router/superAdminRoutes.js";
 import { endedAuctionCron } from "./automation/endedAuctionCron.js";
 import { verifyCommissionCron } from "./automation/verifyCommissionCron.js";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 config({
@@ -20,7 +26,7 @@ config({
 // cors is used to connect frontend and backend
 app.use(
   cors({
-    origin: "http://localhost:5173", // Your frontend URL
+    origin: "https://auction-platform-ruddy.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
@@ -45,6 +51,15 @@ app.use("/api/v1/superadmin", superAdminRouter);
 endedAuctionCron();
 verifyCommissionCron();
 connection();
+
+// Health check route
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'success',
+    message: 'Auction Platform API is running'
+  });
+});
+
 app.use(errorMiddleware);
 
 export default app;
