@@ -2,14 +2,8 @@ import mongoose from "mongoose";
 
 export const connection = async () => {
   try {
-    const { connection } = await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      dbName: "MERN_AUCTION_PLATFORM"
-    });
-
-    console.log(`MongoDB connected with host: ${connection.host}`);
-    console.log(`Database: ${connection.name}`);
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('MongoDB Connected Successfully');
     console.log(`Environment: ${process.env.NODE_ENV}`);
   } catch (error) {
     console.error("Database connection error:", error);
