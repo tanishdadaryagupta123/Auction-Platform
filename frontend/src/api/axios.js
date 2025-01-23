@@ -3,11 +3,11 @@ import { BASE_URL } from './baseApi'
 
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  },
   withCredentials: true,
-  timeout: 15000 // 15 second timeout
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
 })
 
 // Add request interceptor
@@ -17,8 +17,8 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-    // Add CORS headers to every request
-    config.headers['Access-Control-Allow-Credentials'] = true
+    // Ensure credentials are always sent
+    config.withCredentials = true
     return config
   },
   (error) => Promise.reject(error)

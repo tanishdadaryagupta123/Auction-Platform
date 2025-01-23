@@ -27,8 +27,8 @@ config({
 app.use(
   cors({
     origin: [
-      "https://auction-platform-ruddy.vercel.app",
       "https://auction-platform-neon.vercel.app",
+      "https://auction-platform-ruddy.vercel.app",
       "http://localhost:3000"
     ],
     credentials: true,
@@ -43,22 +43,19 @@ app.use(
       "X-Requested-With"
     ],
     exposedHeaders: ["set-cookie"],
-    optionsSuccessStatus: 200,
-    preflightContinue: true
+    optionsSuccessStatus: 200
   })
 );
 
-// Add preflight handler
-app.options('*', cors());
-
-// Add security headers middleware
+// Remove the generic CORS middleware and replace with specific headers
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  const origin = req.headers.origin;
+  if (origin && origin.match(/auction-platform.*\.vercel\.app$/)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Credentials', 'true');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-  );
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   next();
 });
 

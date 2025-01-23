@@ -6,6 +6,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../../api/baseApi";
+import api from '../api/axios';
 
 // Define API_BASE_URL at the top
 // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
@@ -114,35 +115,19 @@ export const register = (data) => async (dispatch) => {
   dispatch(userSlice.actions.registerRequest());
   try {
     const formData = new FormData();
-    
-    // Add basic user data
-    formData.append('name', data.name);
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-    formData.append('role', data.role || 'bidder');
-
-    // Add avatar if exists
-    if (data.avatar && data.avatar instanceof File) {
-      formData.append('avatar', data.avatar);
-    }
-
-    console.log('Sending registration data:', {
-      name: data.name,
-      email: data.email,
-      role: data.role,
-      hasAvatar: !!data.avatar
+    Object.keys(data).forEach(key => {
+      if (key === 'avatar' && data[key]) {
+        formData.append(key, data[key]);
+      } else {
+        formData.append(key, data[key]);
+      }
     });
 
-    const response = await axios.post(
-      `${BASE_URL}/api/v1/user/register`,
-      formData,
-      {
-        withCredentials: true,
-        headers: { 
-          'Accept': 'application/json'
-        }
+    const response = await api.post('/api/v1/user/register', formData, {
+      headers: { 
+        'Content-Type': 'multipart/form-data'
       }
-    );
+    });
 
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
@@ -200,28 +185,14 @@ export const logout = () => async (dispatch) => {
 };
 
 export const fetchUser = () => async (dispatch) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    dispatch(userSlice.actions.fetchUserFailed('No token found'));
-    return;
-  }
-
   dispatch(userSlice.actions.fetchUserRequest());
   try {
-    const response = await axios.get(`${BASE_URL}/api/v1/user/me`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await api.get('/api/v1/user/me');
     dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
   } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Fetch user failed';
     console.error('Fetch User Error:', error);
+    const errorMessage = error.response?.data?.message || 'Failed to fetch user';
     dispatch(userSlice.actions.fetchUserFailed(errorMessage));
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-    }
   }
 };
 
