@@ -142,12 +142,12 @@ const UserProfile = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Easypaisa Account Number
+                      reversepay Account Number
                       </label>
                       <input
                         type="text"
                         defaultValue={
-                          user.paymentMethods.easypaisa.easypaisaAccountNumber
+                          user.paymentMethods.reversepay.reversepayAccountNumber
                         }
                         className="w-ful mt-1 p-2 border-gray-300 rounded-md focus:outline-none"
                         disabled

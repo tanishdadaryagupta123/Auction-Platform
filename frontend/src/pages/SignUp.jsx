@@ -1,3 +1,4 @@
+
 import { register } from "@/store/slices/userSlice";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +14,7 @@ const SignUp = () => {
   const [bankAccountName, setBankAccountName] = useState("");
   const [bankAccountNumber, setBankAccountNumber] = useState("");
   const [bankName, setBankName] = useState("");
-  const [easypaisaAccountNumber, setEasypaisaAccountNumber] = useState("");
+  const [reservepayAccountNumber, setreservepayAccountNumber] = useState("");
   const [paypalEmail, setPaypalEmail] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [profileImagePreview, setProfileImagePreview] = useState("");
@@ -36,7 +37,7 @@ const SignUp = () => {
       (formData.append("bankAccountName", bankAccountName),
       formData.append("bankAccountNumber", bankAccountNumber),
       formData.append("bankName", bankName),
-      formData.append("easypaisaAccountNumber", easypaisaAccountNumber),
+      formData.append("reservepayAccountNumber", reservepayAccountNumber),
       formData.append("paypalEmail", paypalEmail));
     dispatch(register(formData));
   };
@@ -173,10 +174,13 @@ const SignUp = () => {
                     disabled={role === "Bidder"}
                   >
                     <option value="">Select Your Bank</option>
-                    <option value="Meezan Bank">Meezan Bank</option>
-                    <option value="UBL">UBL</option>
-                    <option value="HBL">HBL</option>
-                    <option value="Allied Bank">Allied Bank</option>
+                    <option value="HDFC Bank">HDFC Bank</option>
+                    <option value="SBI Bank">SBI Bank</option>
+                    <option value="PNB Bank">PNB Bank</option>
+                    <option value="BOI Bank">BOI Bank</option>
+                    <option value="IDFC Bank">IDFC Bank</option>
+                    <option value="IDBI Bank">IDBI Bank</option>
+                    <option value="Axis Bank">Axis Bank</option>
                   </select>
                   <input
                     type="text"
@@ -198,14 +202,14 @@ const SignUp = () => {
               </div>
               <div>
                 <label className="text-[16px] text-stone-600 font-semibold">
-                  Easypaisa And Paypal Details
+                  Reservepay And Paypal Details
                 </label>
                 <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
                   <input
                     type="number"
-                    value={easypaisaAccountNumber}
-                    placeholder="Easypaisa Account Number"
-                    onChange={(e) => setEasypaisaAccountNumber(e.target.value)}
+                    value={reservepayAccountNumber}
+                    placeholder="reservepay Account Number"
+                    onChange={(e) => setreservepayAccountNumber(e.target.value)}
                     className="text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1"
                     disabled={role === "Bidder"}
                   />

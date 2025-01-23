@@ -5,20 +5,24 @@ import jwt from "jsonwebtoken";
 const userSchema = new mongoose.Schema({
   userName: {
     type: String,
-    minLength: [3, "Username must caontain at least 3 characters."],
+    minLength: [3, "Username must contain at least 3 characters."],
     maxLength: [40, "Username cannot exceed 40 characters."],
   },
   password: {
     type: String,
     selected: false,
-    minLength: [8, "Password must caontain at least 8 characters."],
+    minLength: [8, "Password must contain at least 8 characters."],
   },
-  email: String,
+  email: {
+    type: String,
+    required: true,
+    unique: true,  // This makes sure emails are unique
+  },
   address: String,
   phone: {
     type: String,
-    minLength: [11, "Phone Number must caontain exact 11 digits."],
-    maxLength: [11, "Phone Number must caontain exact 11 digits."],
+    minLength: [10, "Phone Number must contain exact 10 digits."],
+    maxLength: [10, "Phone Number must contain exact 10 digits."],
   },
   profileImage: {
     public_id: {
@@ -36,8 +40,8 @@ const userSchema = new mongoose.Schema({
       bankAccountName: String,
       bankName: String,
     },
-    easypaisa: {
-      easypaisaAccountNumber: Number,
+    reservepay: {
+      reservepayAccountNumber: Number,
     },
     paypal: {
       paypalEmail: String,
@@ -64,7 +68,7 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
+// bcrypt password fucntion
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
@@ -78,7 +82,7 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
 
 userSchema.methods.generateJsonWebToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE,
+    expiresIn:process.env.JWT_EXPIRE,
   });
 };
 

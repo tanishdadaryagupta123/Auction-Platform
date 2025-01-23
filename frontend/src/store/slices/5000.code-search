@@ -1,0 +1,12 @@
+# Query: 5000
+
+3 results - 3 files
+
+MERN_Stack_Auction_Platform-main\frontend\src\pages\Dashboard\sub-components\PaymentGraph.jsx:
+  58:         max: 5001,
+
+MERN_Stack_Auction_Platform-main\frontend\src\store\slices\bidSlice.js:
+  27:     const response = await axios.post(`http://localhost:5001/api/v1/bid/place/${id}`, data, {
+
+MERN_Stack_Auction_Platform-main\frontend\src\store\slices\userSlice.js:
+  151:     const response = await axios.get("http://localhost:5001/api/v1/user/me", {

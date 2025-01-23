@@ -97,7 +97,7 @@ export const Drawer = ({ setOpenDrawer, openDrawer }) => {
           openDrawer && singlePaymentProof.userId ? "bottom-0" : "-bottom-full"
         }  left-0 w-full transition-all duration-300 h-full bg-[#00000087] flex items-end`}
       >
-        <div className="bg-white h-fit transition-all duration-300 w-full">
+       {/* <div className="bg-white h-fit transition-all duration-300 w-full">
           <div className="w-full px-5 py-8 sm:max-w-[640px] sm:m-auto">
             <h3 className="text-[#D6482B]  text-3xl font-semibold text-center mb-1">
               Update Payment Proof
@@ -177,8 +177,9 @@ export const Drawer = ({ setOpenDrawer, openDrawer }) => {
               </div>
             </form>
           </div>
-        </div>
+        </div>*/}
       </section>
     </>
   );
 };
+  

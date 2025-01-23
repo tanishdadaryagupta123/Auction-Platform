@@ -17,18 +17,18 @@ const app = express();
 config({
   path: "./config/config.env",
 });
-
+// cors is used to connect frontend and backend
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL],
-    methods: ["POST", "GET", "PUT", "DELETE"],
+    origin: "http://localhost:5173", // Your frontend URL
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
-app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // this is used to access the cookies. because we dont use cookieparser so cookie is only generate but we dont access.
+app.use(express.json());// it help to return the data in json formate. we dont use this so we dont access the data
+app.use(express.urlencoded({ extended: true }));//it help to check the data in same formate.
 app.use(
   fileUpload({
     useTempFiles: true,

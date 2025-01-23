@@ -8,20 +8,23 @@
     "express": "^4.19.2",
     "express-fileupload": "^1.5.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.5.3",
+    "mongodb": "^6.8.0",
+    "mongoose": "^8.6.1",
     "node-cron": "^3.0.3",
-    "nodemailer": "^6.9.14"
+    "nodemailer": "^6.9.15"
   },
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "dev": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
 }
