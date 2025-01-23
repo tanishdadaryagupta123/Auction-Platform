@@ -12,19 +12,22 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    assetsDir: 'assets',
     rollupOptions: {
       input: {
         main: './index.html'
       },
       output: {
-        manualChunks: undefined
+        entryFileNames: `assets/[name].js`,
+        chunkFileNames: `assets/[name].js`,
+        assetFileNames: `assets/[name].[ext]`
       }
     },
     sourcemap: false,
     minify: 'terser'
   },
   server: {
-    host: true
+    port: 3000
   },
   esbuild: {
     loader: 'jsx',
