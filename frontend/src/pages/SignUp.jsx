@@ -2,6 +2,7 @@ import { register } from "@/store/slices/userSlice";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const SignUp = () => {
   const [userName, setUserName] = useState("");
@@ -22,8 +23,24 @@ const SignUp = () => {
   const navigateTo = useNavigate();
   const dispatch = useDispatch();
 
+  // Helper function to check if payment fields should be disabled
+  const isPaymentFieldDisabled = role !== "Auctioneer";
+
   const handleRegister = (e) => {
     e.preventDefault();
+
+    // Validate payment details for Auctioneer
+    if (role === "Auctioneer") {
+      if (!bankName || !bankAccountNumber || !bankAccountName) {
+        toast.error("Please fill all bank details for Auctioneer registration");
+        return;
+      }
+      if (!reservepayAccountNumber || !paypalEmail) {
+        toast.error("Please fill all payment service details for Auctioneer registration");
+        return;
+      }
+    }
+
     console.log('Form Data:', {
       userName,
       email,
@@ -31,6 +48,13 @@ const SignUp = () => {
       password,
       address,
       role,
+      ...(role === "Auctioneer" && {
+        bankName,
+        bankAccountNumber,
+        bankAccountName,
+        reservepayAccountNumber,
+        paypalEmail
+      })
     });
 
     const formData = new FormData();
@@ -40,6 +64,7 @@ const SignUp = () => {
     formData.append("password", password);
     formData.append("address", address);
     formData.append("role", role);
+    
     if (profileImage) {
       formData.append("profileImage", profileImage);
     }
@@ -180,15 +205,16 @@ const SignUp = () => {
                 </span>
               </label>
               <div className="flex flex-col gap-2">
-                <label className="text-[16px] text-stone-500">
-                  Bank Details
-                </label>
+                <label className="text-[16px] text-stone-500">Bank Details</label>
                 <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
                   <select
                     value={bankName}
                     onChange={(e) => setBankName(e.target.value)}
-                    className="text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1"
-                    disabled={role === "Bidder"}
+                    className={`text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1 ${
+                      isPaymentFieldDisabled ? 'opacity-50' : ''
+                    }`}
+                    disabled={isPaymentFieldDisabled}
+                    required={role === "Auctioneer"}
                   >
                     <option value="">Select Your Bank</option>
                     <option value="HDFC Bank">HDFC Bank</option>
@@ -204,16 +230,22 @@ const SignUp = () => {
                     value={bankAccountNumber}
                     placeholder="IBAN / IFSC"
                     onChange={(e) => setBankAccountNumber(e.target.value)}
-                    className="text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1"
-                    disabled={role === "Bidder"}
+                    className={`text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1 ${
+                      isPaymentFieldDisabled ? 'opacity-50' : ''
+                    }`}
+                    disabled={isPaymentFieldDisabled}
+                    required={role === "Auctioneer"}
                   />
                   <input
                     type="text"
                     value={bankAccountName}
                     placeholder="Bank Account UserName"
                     onChange={(e) => setBankAccountName(e.target.value)}
-                    className="text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1"
-                    disabled={role === "Bidder"}
+                    className={`text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1 ${
+                      isPaymentFieldDisabled ? 'opacity-50' : ''
+                    }`}
+                    disabled={isPaymentFieldDisabled}
+                    required={role === "Auctioneer"}
                   />
                 </div>
               </div>
@@ -227,16 +259,22 @@ const SignUp = () => {
                     value={reservepayAccountNumber}
                     placeholder="reservepay Account Number"
                     onChange={(e) => setreservepayAccountNumber(e.target.value)}
-                    className="text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1"
-                    disabled={role === "Bidder"}
+                    className={`text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1 ${
+                      isPaymentFieldDisabled ? 'opacity-50' : ''
+                    }`}
+                    disabled={isPaymentFieldDisabled}
+                    required={role === "Auctioneer"}
                   />
                   <input
                     type="email"
                     value={paypalEmail}
                     placeholder="Paypal Email"
                     onChange={(e) => setPaypalEmail(e.target.value)}
-                    className="text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1"
-                    disabled={role === "Bidder"}
+                    className={`text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none sm:flex-1 ${
+                      isPaymentFieldDisabled ? 'opacity-50' : ''
+                    }`}
+                    disabled={isPaymentFieldDisabled}
+                    required={role === "Auctioneer"}
                   />
                 </div>
               </div>
@@ -247,8 +285,7 @@ const SignUp = () => {
               type="submit"
               disabled={loading}
             >
-              {loading && "Registering..."}
-              {!loading && "Register"}
+              {loading ? "Registering..." : "Register"}
             </button>
           </form>
         </div>
