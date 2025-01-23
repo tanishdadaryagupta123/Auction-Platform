@@ -24,20 +24,16 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
+      useUnifiedTopology: true
     });
     
-    if (conn.connection.host) {
-      console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } else {
-      console.log('MongoDB Connected successfully');
-    }
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    console.log('Retrying connection in 5 seconds...');
-    setTimeout(connectDB, 5000);
+    // Exit process with failure in production
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    }
   }
 };
 
