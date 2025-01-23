@@ -12,6 +12,15 @@ const errorMiddleware = (err, req, res, next) => {
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 
+  // Handle Cloudinary errors
+  if (err.name === 'CloudinaryError') {
+    return res.status(500).json({
+      success: false,
+      message: 'Error uploading file to Cloudinary',
+      error: err.message
+    });
+  }
+
   // Default error values
   err.statusCode = err.statusCode || 500;
   err.message = err.message || 'Internal Server Error';

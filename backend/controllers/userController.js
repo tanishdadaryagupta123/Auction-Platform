@@ -1,98 +1,58 @@
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/error.js";
 import { User } from "../models/userSchema.js";
-import { v2 as cloudinary } from "cloudinary";
+import cloudinary from "cloudinary";
 import { generateToken } from "../utils/jwtToken.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return next(new ErrorHandler("Profile Image Required.", 400));
-  }
+  try {
+    const { name, email, password, role } = req.body;
+    let avatar = {};
 
-  const { profileImage } = req.files;
+    if (req.files && req.files.avatar) {
+      try {
+        const result = await cloudinary.v2.uploader.upload(
+          req.files.avatar.tempFilePath,
+          {
+            folder: "avatars",
+            width: 150,
+            crop: "scale",
+          }
+        );
+        
+        avatar = {
+          public_id: result.public_id,
+          url: result.secure_url,
+        };
+      } catch (cloudinaryError) {
+        console.error('Cloudinary Error:', cloudinaryError);
+        return res.status(500).json({
+          success: false,
+          message: "Error uploading image to Cloudinary",
+          error: cloudinaryError.message
+        });
+      }
+    }
 
-  const allowedFormats = ["image/png", "image/jpeg", "image/webp"];
-  if (!allowedFormats.includes(profileImage.mimetype)) {
-    return next(new ErrorHandler("File format not supported.", 400));
-  }
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role,
+      avatar,
+    });
 
-  const {
-    userName,
-    email,
-    password,
-    phone,
-    address,
-    role,
-    bankAccountNumber,
-    bankAccountName,
-    bankName,
-    reservepayAccountNumber,
-    paypalEmail,
-  } = req.body;
+    const token = user.getJWTToken();
 
-  if (!userName || !email || !phone || !password || !address || !role) {
-    return next(new ErrorHandler("Please fill full form.", 400));
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      token,
+    });
+  } catch (error) {
+    console.error('Registration Error:', error);
+    next(error);
   }
-  if (role === "Auctioneer") {
-    if (!bankAccountName || !bankAccountNumber || !bankName) {
-      return next(
-        new ErrorHandler("Please provide your full bank details.", 400)
-      );
-    }
-    if (!reservepayAccountNumber) {
-      return next(
-        new ErrorHandler("Please provide your reservepay account number.", 400)
-      );
-    }
-    if (!paypalEmail) {
-      return next(new ErrorHandler("Please provide your paypal email.", 400));
-    }
-  }
-  const isRegistered = await User.findOne({ email });
-  if (isRegistered) {
-    return next(new ErrorHandler("User already registered.", 400));
-  }
-  const cloudinaryResponse = await cloudinary.uploader.upload(
-    profileImage.tempFilePath,
-    {
-      folder: "MERN_AUCTION_PLATFORM_USERS",
-    }
-  );
-  if (!cloudinaryResponse || cloudinaryResponse.error) {
-    console.error(
-      "Cloudinary error:",
-      cloudinaryResponse.error || "Unknown cloudinary error."
-    );
-    return next(
-      new ErrorHandler("Failed to upload profile image to cloudinary.", 500)
-    );
-  }
-  const user = await User.create({
-    userName,
-    email,
-    password,
-    phone,
-    address,
-    role,
-    profileImage: {
-      public_id: cloudinaryResponse.public_id,
-      url: cloudinaryResponse.secure_url,
-    },
-    paymentMethods: {
-      bankTransfer: {
-        bankAccountNumber,
-        bankAccountName,
-        bankName,
-      },
-      reservepay: {
-        reservepayAccountNumber,
-      },
-      paypal: {
-        paypalEmail,
-      },
-    },
-  });
-  generateToken(user, "User Registered.", 201, res);
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {

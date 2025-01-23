@@ -2,24 +2,35 @@ import mongoose from "mongoose";
 
 export const connection = async () => {
   try {
-    // Get MongoDB URI based on environment
-    const uri = process.env.NODE_ENV === 'production' 
-      ? process.env.MONGO_URI  // Use MongoDB Atlas in production
-      : 'mongodb://127.0.0.1:27017/MERN_AUCTION_PLATFORM'; // Use local MongoDB in development
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const uri = isDevelopment 
+      ? process.env.MONGO_URI 
+      : process.env.MONGODB_ATLAS_URI; // Use different env var for production
 
-    await mongoose.connect(uri);
+    if (!uri) {
+      throw new Error('MongoDB URI is not defined');
+    }
+
+    await mongoose.connect(uri, {
+      dbName: isDevelopment ? "MERN_AUCTION_PLATFORM" : undefined,
+    });
+
     console.log('MongoDB Connected Successfully');
     console.log(`Environment: ${process.env.NODE_ENV}`);
     console.log(`Database Host: ${mongoose.connection.host}`);
     return true;
   } catch (error) {
     console.error("Database connection error:", error);
+    
+    // Log detailed error information
     if (error.name === 'MongoServerSelectionError') {
-      console.error('Could not connect to MongoDB server. Please check:');
-      console.error('1. MongoDB URI is correct');
-      console.error('2. Network connectivity');
-      console.error('3. MongoDB server is running');
-      console.error('4. IP Whitelist in MongoDB Atlas');
+      console.error('MongoDB Connection Details:');
+      console.error(`Environment: ${process.env.NODE_ENV}`);
+      console.error(`Error Code: ${error.code}`);
+      console.error(`Error Message: ${error.message}`);
+      if (error.reason) {
+        console.error('Reason:', error.reason);
+      }
     }
     
     if (process.env.NODE_ENV === 'production') {
