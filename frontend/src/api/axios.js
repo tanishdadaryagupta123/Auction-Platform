@@ -1,6 +1,5 @@
 import axios from 'axios'
-
-const BASE_URL = 'https://auction-platform-icse.onrender.com'
+import { BASE_URL } from './baseApi'
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -13,11 +12,6 @@ const api = axios.create({
 // Add request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Always ensure we're using the production URL
-    if (!config.url.startsWith('https://')) {
-      config.url = `${BASE_URL}${config.url.startsWith('/') ? config.url : `/${config.url}`}`
-    }
-    
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`

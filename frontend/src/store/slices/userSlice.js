@@ -5,9 +5,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { BASE_URL } from "../../api/baseApi";
 
 // Define API_BASE_URL at the top
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 
 // Rest of your code...
 
@@ -113,7 +114,7 @@ export const register = (data) => async (dispatch) => {
   dispatch(userSlice.actions.registerRequest());
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/api/v1/user/register`,
+      `${BASE_URL}/api/v1/user/register`,
       data,
       {
         withCredentials: true,
@@ -134,7 +135,7 @@ export const login = (data) => async (dispatch) => {
   dispatch(userSlice.actions.loginRequest());
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/api/v1/user/login`,
+      `${BASE_URL}/api/v1/user/login`,
       data,
       {
         withCredentials: true,
@@ -154,7 +155,7 @@ export const login = (data) => async (dispatch) => {
 export const logout = () => async (dispatch) => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/api/v1/user/logout`,
+      `${BASE_URL}/api/v1/user/logout`,
       { withCredentials: true }
     );
     dispatch(userSlice.actions.logoutSuccess());
@@ -170,7 +171,7 @@ export const logout = () => async (dispatch) => {
 export const fetchUser = () => async (dispatch) => {
   dispatch(userSlice.actions.fetchUserRequest());
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/v1/user/me`, {
+    const response = await axios.get(`${BASE_URL}/api/v1/user/me`, {
       withCredentials: true,
     });
     dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
@@ -185,7 +186,7 @@ export const fetchLeaderboard = () => async (dispatch) => {
   dispatch(userSlice.actions.fetchLeaderboardRequest());
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/api/v1/user/leaderboard`,
+      `${BASE_URL}/api/v1/user/leaderboard`,
       {
         withCredentials: true,
       }

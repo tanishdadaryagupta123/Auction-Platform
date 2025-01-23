@@ -2,6 +2,7 @@ import axios from "axios";
 import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { getAllAuctionItems } from "./auctionSlice";
+import { BASE_URL } from "../../api/baseApi";
 
 const superAdminSlice = createSlice({
   name: "superAdmin",
@@ -107,7 +108,7 @@ export const getMonthlyRevenue = () => async (dispatch) => {
   dispatch(superAdminSlice.actions.requestForMonthlyRevenue());
   try {
     const response = await axios.get(
-      "http://localhost:5001/api/v1/superadmin/monthlyincome",
+      `${BASE_URL}/api/v1/superadmin/monthlyincome`,
       { withCredentials: true }
     );
     dispatch(
