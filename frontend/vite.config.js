@@ -20,14 +20,15 @@ export default defineConfig({
       output: {
         entryFileNames: `assets/[name].[hash].js`,
         chunkFileNames: `assets/[name].[hash].js`,
-        assetFileNames: `assets/[name].[hash].[ext]`
+        assetFileNames: `assets/[name].[ext]`
       }
     },
     sourcemap: true,
-    minify: 'esbuild'
+    minify: 'esbuild',
+    manifest: true
   },
   define: {
-    'process.env.VITE_API_URL': JSON.stringify('https://auction-platform-icse.onrender.com')
+    'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_BASE_URL)
   },
   server: {
     port: 3000,
