@@ -105,7 +105,28 @@ export const login = catchAsyncErrors(async (req, res, next) => {
   if (!isPasswordMatch) {
     return next(new ErrorHandler("Invalid credentials.", 400));
   }
-  generateToken(user, "Login successfully.", 200, res);
+
+  const token = user.getJWTToken();
+
+  // Set cookie options
+  const options = {
+    expires: new Date(Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    path: '/',
+    domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+  };
+
+  res
+    .status(200)
+    .cookie("token", token, options)
+    .json({
+      success: true,
+      message: "Login successfully.",
+      token,
+      user
+    });
 });
 
 export const getProfile = catchAsyncErrors(async (req, res, next) => {
@@ -118,13 +139,16 @@ export const getProfile = catchAsyncErrors(async (req, res, next) => {
 
 export const logout = catchAsyncErrors(async (req, res, next) => {
   try {
+    // Clear the cookie with appropriate settings
     res
       .status(200)
       .cookie("token", "", {
         expires: new Date(Date.now()),
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+        secure: true, // Always use secure in production
+        sameSite: 'none', // Required for cross-site
+        path: '/',
+        domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
       })
       .json({
         success: true,

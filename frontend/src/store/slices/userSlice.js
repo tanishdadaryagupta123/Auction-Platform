@@ -182,7 +182,7 @@ export const logout = () => async (dispatch) => {
   dispatch(userSlice.actions.logoutRequest());
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get(
+    await axios.get(
       `${BASE_URL}/api/v1/user/logout`,
       { 
         withCredentials: true,
@@ -197,19 +197,14 @@ export const logout = () => async (dispatch) => {
     dispatch(userSlice.actions.logoutSuccess());
     toast.success('Logged out successfully');
     
-    // Optional: Redirect to login page
-    window.location.href = '/login';
+    // Use react-router navigate instead of window.location
+    window.location.replace('/login');
   } catch (error) {
     console.error('Logout Error:', error);
     // Still remove token on error to ensure user is logged out locally
     localStorage.removeItem('token');
     dispatch(userSlice.actions.logoutSuccess());
-    
-    // Show error message only if it's not a 401
-    if (error.response?.status !== 401) {
-      const errorMessage = error.response?.data?.message || 'Logout failed';
-      toast.error(errorMessage);
-    }
+    window.location.replace('/login');
   }
 };
 
