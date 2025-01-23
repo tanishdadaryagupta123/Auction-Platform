@@ -28,8 +28,16 @@ app.use(
   cors({
     origin: ["https://auction-platform-ruddy.vercel.app"],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type", 
+      "Authorization", 
+      "x-csrf-token",
+      "Access-Control-Allow-Headers",
+      "Origin",
+      "Accept"
+    ],
+    exposedHeaders: ["set-cookie"]
   })
 );
 
@@ -61,6 +69,14 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use(errorMiddleware);
+// Add error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(err.status || 500).json({
+    status: 'error',
+    message: err.message || 'Internal server error',
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
 
 export default app;

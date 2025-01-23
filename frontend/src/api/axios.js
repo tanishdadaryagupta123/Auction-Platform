@@ -15,6 +15,10 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+      // Ensure token is properly formatted
+      if (!config.headers.Authorization.startsWith('Bearer ')) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
     return config
   },
@@ -29,6 +33,12 @@ api.interceptors.response.use(
       localStorage.removeItem('token')
       window.location.href = '/login'
     }
+    // Log errors for debugging
+    console.error('API Error:', {
+      status: error.response?.status,
+      message: error.response?.data?.message,
+      url: error.config?.url
+    })
     return Promise.reject(error)
   }
 )

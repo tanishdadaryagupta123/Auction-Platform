@@ -142,6 +142,10 @@ export const login = (data) => async (dispatch) => {
         headers: { "Content-Type": "application/json" },
       }
     );
+    // Store token immediately after login
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
     dispatch(userSlice.actions.loginSuccess(response.data));
     toast.success(response.data.message);
   } catch (error) {
@@ -169,16 +173,28 @@ export const logout = () => async (dispatch) => {
 };
 
 export const fetchUser = () => async (dispatch) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    dispatch(userSlice.actions.fetchUserFailed('No token found'));
+    return;
+  }
+
   dispatch(userSlice.actions.fetchUserRequest());
   try {
     const response = await axios.get(`${BASE_URL}/api/v1/user/me`, {
       withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
     dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Fetch user failed';
     console.error('Fetch User Error:', error);
     dispatch(userSlice.actions.fetchUserFailed(errorMessage));
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+    }
   }
 };
 
