@@ -9,12 +9,9 @@ import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables based on NODE_ENV
-if (process.env.NODE_ENV === 'development') {
-  dotenv.config({ path: './config/config.env' });
-} else {
-  // In production, use environment variables from Render
-  dotenv.config();
+// Load environment variables
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.join(__dirname, 'config', 'config.env') });
 }
 
 // Configure cloudinary
@@ -24,11 +21,12 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Log Cloudinary configuration
-console.log('Cloudinary Configuration:', {
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not Set',
-  api_secret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not Set'
+// Log configuration (but not secrets)
+console.log('Environment:', {
+  NODE_ENV: process.env.NODE_ENV,
+  PORT: process.env.PORT,
+  CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
+  MONGO_URI: process.env.MONGO_URI ? '(set)' : '(not set)'
 });
 
 // Connect to MongoDB

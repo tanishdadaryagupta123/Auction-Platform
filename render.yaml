@@ -3,7 +3,7 @@ services:
     name: auction-backend
     env: node
     buildCommand: npm install
-    startCommand: node server.js
+    startCommand: npm start
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
@@ -18,12 +18,12 @@ services:
         value: 7d
       - key: COOKIE_EXPIRE
         value: 7
-      - key: CLOUDINARY_CLOUD_NAME
-        sync: false
+      - key: CLOUDINARY_NAME
+        value: ds2neoo6i
       - key: CLOUDINARY_API_KEY
-        sync: false
+        value: 485522417296364
       - key: CLOUDINARY_API_SECRET
-        sync: false
+        value: 0bupzasK_v42rpMbnkMaQ6fDOqM
     autoDeploy: true
     disk:
       name: tmp
