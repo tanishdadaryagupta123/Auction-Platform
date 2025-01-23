@@ -6,10 +6,7 @@ export default defineConfig({
   plugins: [
     react({
       jsxRuntime: 'automatic',
-      jsxImportSource: 'react',
-      babel: {
-        plugins: ['@babel/plugin-transform-react-jsx']
-      }
+      jsxImportSource: 'react'
     })
   ],
   resolve: {
@@ -26,13 +23,14 @@ export default defineConfig({
         main: './index.html'
       },
       output: {
-        entryFileNames: `assets/[name].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[ext]`
+        entryFileNames: `assets/[name].[hash].js`,
+        chunkFileNames: `assets/[name].[hash].js`,
+        assetFileNames: `assets/[name].[hash].[ext]`
       }
     },
     sourcemap: false,
-    minify: 'esbuild'
+    minify: 'esbuild',
+    manifest: true
   },
   server: {
     port: 3000
