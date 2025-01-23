@@ -10,6 +10,7 @@ export default defineConfig({
     },
     extensions: ['.mjs', '.js', '.jsx', '.json']
   },
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -41,6 +42,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: true,
     proxy: {
       '/api': {
         target: process.env.VITE_API_BASE_URL || 'http://localhost:5001',

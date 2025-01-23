@@ -40,8 +40,11 @@
   ],
   "routes": [
     {
-      "src": "/[^.]+",
-      "dest": "/",
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
       "status": 200
     }
   ]
