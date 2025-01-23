@@ -12,7 +12,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       phone, 
       password, 
       address, 
-      role = "Bidder",
+      role,
       bankAccountName,
       bankAccountNumber,
       bankName,
@@ -40,7 +40,9 @@ export const register = catchAsyncErrors(async (req, res, next) => {
 
     // Validate role with exact match
     const validRoles = ["Bidder", "Auctioneer"];
-    if (!validRoles.includes(role)) {
+    const normalizedRole = role || "Bidder"; // Default to "Bidder" if not provided
+
+    if (!validRoles.includes(normalizedRole)) {
       return res.status(400).json({
         success: false,
         message: `Invalid role specified. Must be one of: ${validRoles.join(', ')}`
@@ -74,19 +76,19 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       }
     }
 
-    // Create user data object with validated role
+    // Create user data object
     const userData = {
       userName,
       email,
       phone,
       password,
       address,
-      role,
+      role: normalizedRole,
       profileImage
     };
 
     // Add payment methods if role is Auctioneer
-    if (role === "Auctioneer") {
+    if (normalizedRole === "Auctioneer") {
       userData.paymentMethods = {
         bankTransfer: {
           bankAccountNumber,

@@ -119,8 +119,6 @@ const userSlice = createSlice({
 export const register = (data) => async (dispatch) => {
   dispatch(userSlice.actions.registerRequest());
   try {
-    const formData = new FormData();
-    
     // Log the form data being sent
     console.log('Sending registration data:', {
       userName: data.get('userName'),
@@ -128,31 +126,9 @@ export const register = (data) => async (dispatch) => {
       role: data.get('role')
     });
 
-    // Add all form fields
-    formData.append("userName", data.userName);
-    formData.append("email", data.email);
-    formData.append("phone", data.phone);
-    formData.append("password", data.password);
-    formData.append("address", data.address);
-    formData.append("role", data.role);
-    
-    // Add profile image if exists
-    if (data.profileImage) {
-      formData.append("profileImage", data.profileImage);
-    }
-
-    // Add payment details if role is Auctioneer
-    if (data.role === "Auctioneer") {
-      formData.append("bankAccountName", data.bankAccountName);
-      formData.append("bankAccountNumber", data.bankAccountNumber);
-      formData.append("bankName", data.bankName);
-      formData.append("reservepayAccountNumber", data.reservepayAccountNumber);
-      formData.append("paypalEmail", data.paypalEmail);
-    }
-
     const response = await axios.post(
       `${BASE_URL}/api/v1/user/register`,
-      formData,
+      data,
       {
         withCredentials: true,
         headers: { 

@@ -39,7 +39,7 @@ const SignUp = () => {
     formData.append("phone", phone);
     formData.append("password", password);
     formData.append("address", address);
-    formData.append("role", role || "Bidder");
+    formData.append("role", role);
     if (profileImage) {
       formData.append("profileImage", profileImage);
     }
