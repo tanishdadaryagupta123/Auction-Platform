@@ -3,61 +3,28 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
-  userName: {
+  name: {
     type: String,
-    minLength: [3, "Username must contain at least 3 characters."],
-    maxLength: [40, "Username cannot exceed 40 characters."],
-  },
-  password: {
-    type: String,
-    selected: false,
-    minLength: [8, "Password must contain at least 8 characters."],
+    required: [true, "Please enter your name"],
   },
   email: {
     type: String,
-    required: true,
-    unique: true,  // This makes sure emails are unique
+    required: [true, "Please enter your email"],
+    unique: true,
   },
-  address: String,
-  phone: {
+  password: {
     type: String,
-    minLength: [10, "Phone Number must contain exact 10 digits."],
-    maxLength: [10, "Phone Number must contain exact 10 digits."],
-  },
-  profileImage: {
-    public_id: {
-      type: String,
-      required: true,
-    },
-    url: {
-      type: String,
-      required: true,
-    },
-  },
-  paymentMethods: {
-    bankTransfer: {
-      bankAccountNumber: String,
-      bankAccountName: String,
-      bankName: String,
-    },
-    reservepay: {
-      reservepayAccountNumber: Number,
-    },
-    paypal: {
-      paypalEmail: String,
-    },
+    required: [true, "Please enter your password"],
+    select: false,
   },
   role: {
     type: String,
-    enum: ["Auctioneer", "Bidder", "Super Admin"],
+    enum: ["auctioneer", "bidder"],
+    default: "bidder",
   },
-  unpaidCommission: {
-    type: Number,
-    default: 0,
-  },
-  auctionsWon: {
-    type: Number,
-    default: 0,
+  avatar: {
+    public_id: String,
+    url: String
   },
   moneySpent: {
     type: Number,
@@ -68,21 +35,23 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-// bcrypt password fucntion
+
+// Hash password
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
-  }
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
+  next();
 });
 
+// Compare password
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.methods.generateJsonWebToken = function () {
+// Generate JWT token
+userSchema.methods.getJWTToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn:process.env.JWT_EXPIRE,
+    expiresIn: process.env.JWT_EXPIRE,
   });
 };
 

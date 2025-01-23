@@ -6,16 +6,19 @@ import { generateToken } from "../utils/jwtToken.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
-    let avatar = {};
+    console.log('Registration request body:', req.body);
+    console.log('Registration files:', req.files);
 
-    // Log request data (without sensitive info)
-    console.log('Registration attempt:', { 
-      name, 
-      email, 
-      role,
-      hasAvatar: !!req.files?.avatar 
-    });
+    const { name, email, password, role } = req.body;
+    
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all required fields"
+      });
+    }
+
+    let avatar = undefined;
 
     if (req.files && req.files.avatar) {
       try {
@@ -42,7 +45,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       }
     }
 
-    // Check if user already exists
+    // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -52,15 +55,19 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     }
 
     // Create user
-    const user = await User.create({
+    const userData = {
       name,
       email,
       password,
-      role,
-      avatar: Object.keys(avatar).length > 0 ? avatar : undefined
-    });
+      role: role || 'bidder'
+    };
 
-    // Generate token
+    if (avatar) {
+      userData.avatar = avatar;
+    }
+
+    const user = await User.create(userData);
+
     const token = user.getJWTToken();
 
     res.status(201).json({

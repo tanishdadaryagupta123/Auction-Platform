@@ -113,14 +113,24 @@ const userSlice = createSlice({
 export const register = (data) => async (dispatch) => {
   dispatch(userSlice.actions.registerRequest());
   try {
-    // Create FormData if there's a file
     const formData = new FormData();
-    Object.keys(data).forEach(key => {
-      if (key === 'avatar' && data[key]) {
-        formData.append(key, data[key]);
-      } else {
-        formData.append(key, data[key]);
-      }
+    
+    // Add basic user data
+    formData.append('name', data.name);
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    formData.append('role', data.role || 'bidder');
+
+    // Add avatar if exists
+    if (data.avatar && data.avatar instanceof File) {
+      formData.append('avatar', data.avatar);
+    }
+
+    console.log('Sending registration data:', {
+      name: data.name,
+      email: data.email,
+      role: data.role,
+      hasAvatar: !!data.avatar
     });
 
     const response = await axios.post(
@@ -129,7 +139,6 @@ export const register = (data) => async (dispatch) => {
       {
         withCredentials: true,
         headers: { 
-          'Content-Type': 'multipart/form-data',
           'Accept': 'application/json'
         }
       }
@@ -140,9 +149,9 @@ export const register = (data) => async (dispatch) => {
     }
 
     dispatch(userSlice.actions.registerSuccess(response.data));
-    toast.success(response.data.message);
+    toast.success('Registration successful!');
   } catch (error) {
-    console.error('Registration Error:', error);
+    console.error('Registration Error:', error.response?.data || error);
     const errorMessage = error.response?.data?.message || 'Registration failed';
     dispatch(userSlice.actions.registerFailed(errorMessage));
     toast.error(errorMessage);
