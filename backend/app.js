@@ -79,4 +79,15 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Add at the end of your routes
+app.use(errorMiddleware);
+
+// Add a catch-all error handler for unhandled routes
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Cannot ${req.method} ${req.originalUrl}`
+  });
+});
+
 export default app;

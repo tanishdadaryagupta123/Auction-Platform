@@ -5,33 +5,41 @@ class ErrorHandler extends Error {
   }
 }
 
-export const errorMiddleware = (err, req, res, next) => {
-  err.message = err.message || "Internal server error.";
+const errorMiddleware = (err, req, res, next) => {
+  console.error('Error:', {
+    name: err.name,
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+
+  // Default error values
   err.statusCode = err.statusCode || 500;
+  err.message = err.message || 'Internal Server Error';
 
-  if (err.name === "JsonWebTokenError") {
-    const message = "Json web token is invalid, Try again.";
-    err = new ErrorHandler(message, 400);
-  }
-  if (err.name === "TokenExpiredError") {
-    const message = "Json web token is expired, Try again.";
-    err = new ErrorHandler(message, 400);
-  }
-  if (err.name === "CastError") {
-    const message = `Invalid ${err.path}`;
-    err = new ErrorHandler(message, 400);
+  // Handle specific error types
+  if (err.name === 'CastError') {
+    err.message = `Invalid ${err.path}: ${err.value}`;
+    err.statusCode = 400;
   }
 
-  const errorMessage = err.errors
-    ? Object.values(err.errors)
-        .map((error) => error.message)
-        .join(" ")
-    : err.message;
+  if (err.code === 11000) {
+    err.message = `Duplicate ${Object.keys(err.keyValue)} entered`;
+    err.statusCode = 400;
+  }
 
-  return res.status(err.statusCode).json({
+  if (err.name === 'JsonWebTokenError') {
+    err.message = 'Invalid token';
+    err.statusCode = 401;
+  }
+
+  res.status(err.statusCode).json({
     success: false,
-    message: errorMessage,
+    message: err.message,
+    error: err,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 };
+
+export { errorMiddleware };
 
 export default ErrorHandler;

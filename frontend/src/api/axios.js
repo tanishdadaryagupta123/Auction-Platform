@@ -6,7 +6,8 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  withCredentials: true
+  withCredentials: true,
+  timeout: 15000 // 15 second timeout
 })
 
 // Add request interceptor
@@ -29,16 +30,18 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      url: error.config?.url,
+      method: error.config?.method
+    });
+
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
       window.location.href = '/login'
     }
-    // Log errors for debugging
-    console.error('API Error:', {
-      status: error.response?.status,
-      message: error.response?.data?.message,
-      url: error.config?.url
-    })
+
     return Promise.reject(error)
   }
 )
