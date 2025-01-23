@@ -1,8 +1,9 @@
 import axios from 'axios'
-import { API_URL } from '../config/config'
+
+const BASE_URL = 'https://auction-platform-icse.onrender.com'
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   },
@@ -12,8 +13,10 @@ const api = axios.create({
 // Add request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Force the base URL to always be the production URL
-    config.baseURL = 'https://auction-platform-icse.onrender.com'
+    // Always ensure we're using the production URL
+    if (!config.url.startsWith('https://')) {
+      config.url = `${BASE_URL}${config.url.startsWith('/') ? config.url : `/${config.url}`}`
+    }
     
     const token = localStorage.getItem('token')
     if (token) {
@@ -21,15 +24,13 @@ api.interceptors.request.use(
     }
     return config
   },
-  (error) => {
-    return Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 )
 
 // Add response interceptor
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
       window.location.href = '/login'
