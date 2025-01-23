@@ -39,10 +39,12 @@ app.use(
       "x-csrf-token",
       "Access-Control-Allow-Headers",
       "Origin",
-      "Accept"
+      "Accept",
+      "X-Requested-With"
     ],
     exposedHeaders: ["set-cookie"],
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    preflightContinue: true
   })
 );
 
@@ -68,7 +70,9 @@ app.use(
     useTempFiles: true,
     tempFileDir: "/tmp/",
     limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max-file-size
-    debug: process.env.NODE_ENV === 'development'
+    debug: process.env.NODE_ENV === 'development',
+    createParentPath: true,
+    parseNested: true
   })
 );
 

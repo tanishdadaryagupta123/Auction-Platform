@@ -9,7 +9,9 @@ const errorMiddleware = (err, req, res, next) => {
   console.error('Error:', {
     name: err.name,
     message: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    body: req.body,
+    files: req.files
   });
 
   // Handle Cloudinary errors
@@ -44,8 +46,7 @@ const errorMiddleware = (err, req, res, next) => {
   res.status(err.statusCode).json({
     success: false,
     message: err.message,
-    error: err,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    error: process.env.NODE_ENV === 'development' ? err : undefined
   });
 };
 

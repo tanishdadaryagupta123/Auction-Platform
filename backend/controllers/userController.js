@@ -9,6 +9,14 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     const { name, email, password, role } = req.body;
     let avatar = {};
 
+    // Log request data (without sensitive info)
+    console.log('Registration attempt:', { 
+      name, 
+      email, 
+      role,
+      hasAvatar: !!req.files?.avatar 
+    });
+
     if (req.files && req.files.avatar) {
       try {
         const result = await cloudinary.v2.uploader.upload(
@@ -25,33 +33,55 @@ export const register = catchAsyncErrors(async (req, res, next) => {
           url: result.secure_url,
         };
       } catch (cloudinaryError) {
-        console.error('Cloudinary Error:', cloudinaryError);
-        return res.status(500).json({
+        console.error('Cloudinary Upload Error:', cloudinaryError);
+        return res.status(400).json({
           success: false,
-          message: "Error uploading image to Cloudinary",
+          message: "Error uploading image",
           error: cloudinaryError.message
         });
       }
     }
 
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists with this email"
+      });
+    }
+
+    // Create user
     const user = await User.create({
       name,
       email,
       password,
       role,
-      avatar,
+      avatar: Object.keys(avatar).length > 0 ? avatar : undefined
     });
 
+    // Generate token
     const token = user.getJWTToken();
 
     res.status(201).json({
       success: true,
       message: "User registered successfully",
       token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar
+      }
     });
   } catch (error) {
     console.error('Registration Error:', error);
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Registration failed",
+      error: process.env.NODE_ENV === 'development' ? error : undefined
+    });
   }
 });
 

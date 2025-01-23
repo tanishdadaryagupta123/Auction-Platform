@@ -113,19 +113,37 @@ const userSlice = createSlice({
 export const register = (data) => async (dispatch) => {
   dispatch(userSlice.actions.registerRequest());
   try {
+    // Create FormData if there's a file
+    const formData = new FormData();
+    Object.keys(data).forEach(key => {
+      if (key === 'avatar' && data[key]) {
+        formData.append(key, data[key]);
+      } else {
+        formData.append(key, data[key]);
+      }
+    });
+
     const response = await axios.post(
       `${BASE_URL}/api/v1/user/register`,
-      data,
+      formData,
       {
         withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json'
+        }
       }
     );
+
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+
     dispatch(userSlice.actions.registerSuccess(response.data));
     toast.success(response.data.message);
   } catch (error) {
+    console.error('Registration Error:', error);
     const errorMessage = error.response?.data?.message || 'Registration failed';
-    console.error('Register Error:', error);
     dispatch(userSlice.actions.registerFailed(errorMessage));
     toast.error(errorMessage);
   }
