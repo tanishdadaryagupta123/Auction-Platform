@@ -80,6 +80,12 @@ const userSlice = createSlice({
       state.user = {};
       state.error = action.payload;
     },
+    logoutRequest(state) {
+      state.loading = true;
+      state.isAuthenticated = false;
+      state.user = {};
+      state.error = null;
+    },
     logoutSuccess(state) {
       state.isAuthenticated = false;
       state.user = {};
@@ -173,34 +179,65 @@ export const login = (data) => async (dispatch) => {
 };
 
 export const logout = () => async (dispatch) => {
+  dispatch(userSlice.actions.logoutRequest());
   try {
+    const token = localStorage.getItem('token');
     const response = await axios.get(
       `${BASE_URL}/api/v1/user/logout`,
-      { withCredentials: true }
+      { 
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
     );
+    
+    // Clear token and user data
+    localStorage.removeItem('token');
     dispatch(userSlice.actions.logoutSuccess());
-    toast.success(response.data.message);
+    toast.success('Logged out successfully');
+    
+    // Optional: Redirect to login page
+    window.location.href = '/login';
   } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Logout failed';
     console.error('Logout Error:', error);
-    dispatch(userSlice.actions.logoutFailed(errorMessage));
-    toast.error(errorMessage);
+    // Still remove token on error to ensure user is logged out locally
+    localStorage.removeItem('token');
+    dispatch(userSlice.actions.logoutSuccess());
+    
+    // Show error message only if it's not a 401
+    if (error.response?.status !== 401) {
+      const errorMessage = error.response?.data?.message || 'Logout failed';
+      toast.error(errorMessage);
+    }
   }
 };
 
 export const fetchUser = () => async (dispatch) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return; // Don't dispatch anything if no token exists
+  }
+
   dispatch(userSlice.actions.fetchUserRequest());
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${BASE_URL}/api/v1/user/me`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`
+    const response = await axios.get(
+      `${BASE_URL}/api/v1/user/me`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       }
-    });
+    );
     dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
   } catch (error) {
     console.error('Fetch User Error:', error);
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      // Optionally redirect to login
+      // window.location.href = '/login';
+    }
     const errorMessage = error.response?.data?.message || 'Failed to fetch user';
     dispatch(userSlice.actions.fetchUserFailed(errorMessage));
   }

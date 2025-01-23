@@ -1,11 +1,20 @@
 import { User } from "../models/userSchema.js";
 import jwt from "jsonwebtoken";
 import ErrorHandler from "./error.js";
-import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
+import { catchAsyncErrors } from "./catchAsyncErrors.js";
 
-const auth = async (req, res, next) => {
+export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        success: false,
+        message: "Please login to access this resource"
+      });
+    }
+
+    const token = authHeader.split(' ')[1];
     
     if (!token) {
       return res.status(401).json({
@@ -14,35 +23,39 @@ const auth = async (req, res, next) => {
       });
     }
 
-    // Verify token and set user in req
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    req.user = await User.findById(decoded.id);
-    
-    if (!req.user) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      req.user = await User.findById(decoded.id);
+      
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+      
+      next();
+    } catch (error) {
       return res.status(401).json({
         success: false,
-        message: "User not found"
+        message: "Invalid or expired token"
       });
     }
-
-    next();
   } catch (error) {
     console.error('Auth Error:', error);
-    return res.status(401).json({
+    return res.status(500).json({
       success: false,
-      message: "Invalid token"
+      message: "Authentication error"
     });
   }
-};
-
-export const isAuthenticated = catchAsyncErrors(auth);
+});
 
 export const isAuthorized = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
         new ErrorHandler(
-          `${req.user.role} not allowed to access this resouce.`,
+          `${req.user.role} is not allowed to access this resource`,
           403
         )
       );
