@@ -38,11 +38,12 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       });
     }
 
-    // Validate role
-    if (role && !["Bidder", "Auctioneer"].includes(role)) {
+    // Validate role with exact match
+    const validRoles = ["Bidder", "Auctioneer"];
+    if (!validRoles.includes(role)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid role specified"
+        message: `Invalid role specified. Must be one of: ${validRoles.join(', ')}`
       });
     }
 
@@ -73,14 +74,14 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       }
     }
 
-    // Create user data object
+    // Create user data object with validated role
     const userData = {
       userName,
       email,
       phone,
       password,
       address,
-      role: role || "Bidder",
+      role,
       profileImage
     };
 

@@ -32,7 +32,13 @@ const userSchema = new mongoose.Schema({
       message: "{VALUE} is not a valid role"
     },
     default: "Bidder",
-    required: [true, "Role is required"]
+    required: [true, "Role is required"],
+    validate: {
+      validator: function(v) {
+        return ["Bidder", "Auctioneer"].includes(v);
+      },
+      message: props => `${props.value} is not a valid role`
+    }
   },
   profileImage: {
     public_id: String,

@@ -121,6 +121,13 @@ export const register = (data) => async (dispatch) => {
   try {
     const formData = new FormData();
     
+    // Log the form data being sent
+    console.log('Sending registration data:', {
+      userName: data.get('userName'),
+      email: data.get('email'),
+      role: data.get('role')
+    });
+
     // Add all form fields
     formData.append("userName", data.userName);
     formData.append("email", data.email);
