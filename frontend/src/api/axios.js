@@ -17,8 +17,12 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-    // Ensure credentials are always sent
-    config.withCredentials = true
+    
+    // Add CORS headers for local development
+    if (process.env.NODE_ENV !== 'production') {
+      config.headers['Access-Control-Allow-Origin'] = '*'
+    }
+    
     return config
   },
   (error) => Promise.reject(error)

@@ -45,9 +45,12 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: process.env.VITE_API_BASE_URL || 'http://localhost:5001',
+        target: process.env.NODE_ENV === 'production' 
+          ? 'https://auction-platform-icse.onrender.com'
+          : 'http://localhost:5001',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     },
     historyApiFallback: true
