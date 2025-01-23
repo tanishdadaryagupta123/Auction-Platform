@@ -6,6 +6,17 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
+  "routes": [
+    { "handle": "filesystem" },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "status": 200,
+      "headers": {
+        "Cache-Control": "s-maxage=1, stale-while-revalidate"
+      }
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -34,18 +45,12 @@
         {
           "key": "Access-Control-Allow-Headers",
           "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
-    }
-  ],
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html",
-      "status": 200
     }
   ]
 } 
