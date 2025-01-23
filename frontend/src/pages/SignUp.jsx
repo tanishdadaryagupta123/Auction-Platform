@@ -1,4 +1,3 @@
-
 import { register } from "@/store/slices/userSlice";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +8,7 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("Bidder");
   const [password, setPassword] = useState("");
   const [bankAccountName, setBankAccountName] = useState("");
   const [bankAccountNumber, setBankAccountNumber] = useState("");
@@ -33,12 +32,13 @@ const SignUp = () => {
     formData.append("address", address);
     formData.append("role", role);
     formData.append("profileImage", profileImage);
-    role === "Auctioneer" &&
-      (formData.append("bankAccountName", bankAccountName),
-      formData.append("bankAccountNumber", bankAccountNumber),
-      formData.append("bankName", bankName),
-      formData.append("reservepayAccountNumber", reservepayAccountNumber),
-      formData.append("paypalEmail", paypalEmail));
+    if (role === "Auctioneer") {
+      formData.append("bankAccountName", bankAccountName);
+      formData.append("bankAccountNumber", bankAccountNumber);
+      formData.append("bankName", bankName);
+      formData.append("reservepayAccountNumber", reservepayAccountNumber);
+      formData.append("paypalEmail", paypalEmail);
+    }
     dispatch(register(formData));
   };
 
@@ -50,12 +50,16 @@ const SignUp = () => {
 
   const imageHandler = (e) => {
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      setProfileImagePreview(reader.result);
+    if (file) {
       setProfileImage(file);
-    };
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setProfileImagePreview(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -121,10 +125,10 @@ const SignUp = () => {
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   className="text-[16px] py-2 bg-transparent border-b-[1px] border-b-stone-500 focus:outline-none"
+                  required
                 >
-                  <option value="">Select Role</option>
-                  <option value="Auctioneer">Auctioneer</option>
                   <option value="Bidder">Bidder</option>
+                  <option value="Auctioneer">Auctioneer</option>
                 </select>
               </div>
               <div className="flex flex-col sm:flex-1">
