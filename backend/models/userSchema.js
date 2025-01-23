@@ -27,8 +27,12 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["Auctioneer", "Bidder"],
+    enum: {
+      values: ["Bidder", "Auctioneer"],
+      message: "{VALUE} is not a valid role"
+    },
     default: "Bidder",
+    required: [true, "Role is required"]
   },
   profileImage: {
     public_id: String,

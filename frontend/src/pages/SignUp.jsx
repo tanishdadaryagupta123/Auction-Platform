@@ -24,14 +24,26 @@ const SignUp = () => {
 
   const handleRegister = (e) => {
     e.preventDefault();
+    console.log('Form Data:', {
+      userName,
+      email,
+      phone,
+      password,
+      address,
+      role,
+    });
+
     const formData = new FormData();
     formData.append("userName", userName);
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("password", password);
     formData.append("address", address);
-    formData.append("role", role);
-    formData.append("profileImage", profileImage);
+    formData.append("role", role || "Bidder");
+    if (profileImage) {
+      formData.append("profileImage", profileImage);
+    }
+
     if (role === "Auctioneer") {
       formData.append("bankAccountName", bankAccountName);
       formData.append("bankAccountNumber", bankAccountNumber);
@@ -39,6 +51,7 @@ const SignUp = () => {
       formData.append("reservepayAccountNumber", reservepayAccountNumber);
       formData.append("paypalEmail", paypalEmail);
     }
+
     dispatch(register(formData));
   };
 

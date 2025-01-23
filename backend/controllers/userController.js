@@ -12,7 +12,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       phone, 
       password, 
       address, 
-      role,
+      role = "Bidder",
       bankAccountName,
       bankAccountNumber,
       bankName,
@@ -20,11 +20,29 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       paypalEmail
     } = req.body;
 
+    // Log the received data
+    console.log('Registration Data:', {
+      userName,
+      email,
+      phone,
+      address,
+      role,
+      hasPaymentDetails: !!bankAccountName
+    });
+
     // Validate required fields
-    if (!userName || !email || !password || !phone || !address || !role) {
+    if (!userName || !email || !password || !phone || !address) {
       return res.status(400).json({
         success: false,
         message: "Please provide all required fields"
+      });
+    }
+
+    // Validate role
+    if (role && !["Bidder", "Auctioneer"].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role specified"
       });
     }
 
@@ -62,7 +80,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       phone,
       password,
       address,
-      role,
+      role: role || "Bidder",
       profileImage
     };
 
