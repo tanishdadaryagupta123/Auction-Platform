@@ -11,7 +11,15 @@ export default defineConfig({
     extensions: ['.js', '.jsx', '.json']
   },
   server: {
-    host: true
+    host: true,
+    middlewareMode: true
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html'
+      }
+    }
   }
 })
 
