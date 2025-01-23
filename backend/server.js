@@ -24,29 +24,43 @@ const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('MongoDB Connected Successfully');
+    return true;
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    // Exit process with failure in production
-    if (process.env.NODE_ENV === 'production') {
-      process.exit(1);
-    }
+    return false;
   }
 };
 
 // Initialize server
 const startServer = async () => {
   try {
-    await connectDB();
-    
-    const port = process.env.PORT || 5001;
-    const nodeEnv = process.env.NODE_ENV || 'development';
+    // Try to connect to MongoDB
+    const isConnected = await connectDB();
+    if (!isConnected && process.env.NODE_ENV === 'production') {
+      console.log('Could not connect to MongoDB. Retrying in 5 seconds...');
+      setTimeout(startServer, 5000);
+      return;
+    }
 
-    app.listen(port, () => {
-      console.log(`Server running in ${nodeEnv} mode on port ${port}`);
+    const port = process.env.PORT || 5001;
+    const server = app.listen(port, () => {
+      console.log(`Server running on port ${port} in ${process.env.NODE_ENV} mode`);
     });
+
+    // Handle server errors
+    server.on('error', (error) => {
+      console.error('Server error:', error);
+      process.exit(1);
+    });
+
   } catch (error) {
     console.error('Server startup error:', error);
-    process.exit(1);
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Retrying server startup in 5 seconds...');
+      setTimeout(startServer, 5000);
+    } else {
+      process.exit(1);
+    }
   }
 };
 
@@ -64,4 +78,10 @@ process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
   console.log(err.name, err.message);
   process.exit(1);
+});
+
+// Handle SIGTERM
+process.on('SIGTERM', () => {
+  console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+  process.exit(0);
 });

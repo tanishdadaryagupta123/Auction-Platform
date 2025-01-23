@@ -4,14 +4,15 @@ services:
     env: node
     buildCommand: npm install
     startCommand: node server.js
+    healthCheckPath: /
     envVars:
-      - key: PORT
-        value: 8080
       - key: NODE_ENV
         value: production
-      - key: MONGODB_URI
+      - key: MONGO_URI
         sync: false
-      - key: JWT_SECRET
+      - key: PORT
+        value: 8080
+      - key: JWT_SECRET_KEY
         sync: false
       - key: JWT_EXPIRE
         value: 7d
@@ -22,4 +23,9 @@ services:
       - key: CLOUDINARY_API_KEY
         sync: false
       - key: CLOUDINARY_API_SECRET
-        sync: false 
+        sync: false
+    autoDeploy: true
+    disk:
+      name: tmp
+      mountPath: /tmp
+      sizeGB: 1 
